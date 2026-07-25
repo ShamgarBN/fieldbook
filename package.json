@@ -1,8 +1,10 @@
 {
-  "name": "birdsong",
+  "name": "fieldbook",
   "version": "0.1.0",
   "private": true,
-  "description": "Fieldbook — wall-mounted Portal shows Audubon-style art for birds heard in the yard",
+  "description": "A living field guide: shows Audubon-style art for birds heard in the yard",
+  "license": "MIT",
+  "author": "ShamgarBN",
   "type": "module",
   "engines": {
     "node": ">=20"

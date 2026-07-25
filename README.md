@@ -308,3 +308,15 @@ With no hardware, exercise the display with a fake detection:
 curl -X POST localhost:3000/simulate -H 'content-type: application/json' \
   -d '{"species":"American Robin","confidence":0.9}'
 ```
+
+---
+
+## License
+
+[MIT](LICENSE) — use it, change it, share it; just keep the copyright notice, and know it
+comes with no warranty.
+
+One caveat: Fieldbook *orchestrates* [BirdNET](https://github.com/kahst/BirdNET-Analyzer) (via
+BirdNET-Go), whose model is licensed **non-commercially** (CC BY-NC-SA 4.0). This repo's MIT
+license covers Fieldbook's own code — but if you run the detection stack, you're also bound by
+BirdNET's terms, which matter only if you try to commercialize it.
