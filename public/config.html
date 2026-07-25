@@ -1,0 +1,136 @@
+<!-- Fieldbook — mobile config page (iPhone on the home network). -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#3d4a37" />
+<title>Fieldbook · Control</title>
+<link rel="stylesheet" href="/config.css" />
+
+<header class="topbar">
+  <h1>Fieldbook</h1>
+  <a class="wall-link" href="/" target="_blank" rel="noopener">Open wall ↗</a>
+</header>
+
+<nav class="seg" role="tablist" aria-label="Sections">
+  <button class="seg-tab" role="tab" id="tab-status" aria-controls="view-status" aria-selected="true" data-view="status">Status</button>
+  <button class="seg-tab" role="tab" id="tab-settings" aria-controls="view-settings" aria-selected="false" data-view="settings">Settings</button>
+  <button class="seg-tab" role="tab" id="tab-art" aria-controls="view-art" aria-selected="false" data-view="art">Art</button>
+</nav>
+
+<main class="wrap">
+
+  <!-- ============ STATUS ============ -->
+  <section class="view" id="view-status" role="tabpanel" aria-labelledby="tab-status" data-panel="status">
+    <div class="card" id="status-card">
+      <h2>System</h2>
+      <div class="status-grid">
+        <div class="stat">
+          <span class="dot" id="pi-dot"></span>
+          <div><div class="stat-label">Listening</div><div class="stat-value" id="pi-status">—</div></div>
+        </div>
+        <div class="stat">
+          <div><div class="stat-label">Display</div><div class="stat-value" id="mode-status">—</div></div>
+        </div>
+        <div class="stat">
+          <div><div class="stat-label">Last heard</div><div class="stat-value" id="last-heard">—</div></div>
+        </div>
+        <div class="stat">
+          <div><div class="stat-label">Library</div><div class="stat-value" id="lib-count">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>Detections</h2>
+        <span class="badge" id="det-summary">—</span>
+      </div>
+      <ul class="log" id="det-log"><li class="empty">Loading…</li></ul>
+    </div>
+
+    <div class="card" id="metrics-card">
+      <div class="card-head">
+        <h2>Activity</h2>
+        <span class="badge" id="metrics-badge">—</span>
+      </div>
+      <div class="mini-tiles">
+        <div class="mini"><div class="mini-num" id="m-total">—</div><div class="mini-lbl">detections</div></div>
+        <div class="mini"><div class="mini-num" id="m-species">—</div><div class="mini-lbl">species</div></div>
+      </div>
+      <h3 class="sub">Most heard</h3>
+      <div class="bars" id="m-leaderboard"><div class="empty">—</div></div>
+      <h3 class="sub">When they sing <span class="sub-note">by hour of day</span></h3>
+      <div class="hours" id="m-hours"></div>
+      <div class="hours-axis" id="m-hours-axis" hidden>
+        <span>12a</span><span>6a</span><span>noon</span><span>6p</span><span>11p</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SETTINGS ============ -->
+  <section class="view" id="view-settings" role="tabpanel" aria-labelledby="tab-settings" data-panel="settings" hidden>
+    <div class="card">
+      <h2>Idle timeout</h2>
+      <p class="hint">How long a bird stays on the wall after it was last heard.</p>
+      <div class="slider-row">
+        <input type="range" id="timeout-range" min="1" max="60" step="1" />
+        <output id="timeout-out">10 min</output>
+      </div>
+      <button class="btn" id="timeout-save">Save</button>
+      <span class="save-note" id="timeout-note" hidden></span>
+    </div>
+
+    <div class="card">
+      <h2>Empty-nest hold</h2>
+      <p class="hint">Once the last bird drops off, how long the empty nest stays on the wall before the 48-hour collage takes over. Set to 0 to skip the nest and go straight to the collage.</p>
+      <div class="slider-row">
+        <input type="range" id="nest-range" min="0" max="120" step="1" />
+        <output id="nest-out">15 min</output>
+      </div>
+      <button class="btn" id="nest-save">Save</button>
+      <span class="save-note" id="nest-note" hidden></span>
+    </div>
+
+    <div class="card">
+      <h2>Reset activity</h2>
+      <p class="hint">Permanently deletes all detection history — clears the collage, the detection log, and the Activity stats. Your art library is kept. Use this to wipe test data before going live.</p>
+      <button class="btn danger" id="reset-activity">Reset recent activity</button>
+      <span class="save-note" id="reset-note" hidden></span>
+    </div>
+  </section>
+
+  <!-- ============ ART ============ -->
+  <section class="view" id="view-art" role="tabpanel" aria-labelledby="tab-art" data-panel="art" hidden>
+    <div class="card" id="disc-card">
+      <div class="card-head">
+        <h2>Newly discovered</h2>
+        <span class="badge" id="disc-badge">—</span>
+      </div>
+      <p class="hint">Birds first heard in your yard and painted on the fly — the ones you didn't pre-generate.</p>
+      <div class="grid" id="disc-grid"><div class="empty">Loading…</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>Art library</h2>
+        <span class="badge" id="lib-badge">—</span>
+      </div>
+      <div class="grid" id="lib-grid"><div class="empty">Loading…</div></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Full-size bird preview -->
+<div class="lightbox" id="lightbox" hidden>
+  <div class="lb-inner" id="lb-inner">
+    <img class="lb-img" id="lb-img" alt="" />
+    <div class="lb-cap">
+      <div class="lb-name" id="lb-name"></div>
+      <div class="lb-sci" id="lb-sci"></div>
+      <div class="lb-meta" id="lb-meta"></div>
+    </div>
+    <button class="btn lb-close" id="lb-close">Close</button>
+  </div>
+</div>
+
+<script src="/config.js"></script>

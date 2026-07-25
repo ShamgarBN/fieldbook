@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# env / secrets
+.env
+.env.local
+
+# runtime data
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# generated art library (regenerable; keep the dir, ignore contents)
+art/*
+!art/.gitkeep
+
+# build artifacts (per global convention)
+*.dmg
+
+# os
+.DS_Store
+
+# local editor/agent tooling
+.claude/

@@ -1,0 +1,204 @@
+:root {
+  /* Soft blue canvas (Ben, 2026-07-09: bluer, less gray); warm brown ink kept */
+  --paper: #d5e6f4;
+  --paper-deep: #bcd6ec;
+  --paper-edge: #a2c4e2;
+  --ink: #3a3226;
+  --ink-soft: #6b5f49;
+  --accent: #6a7051;
+  --frame: #2a2318;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--frame);
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.stage {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Bird size adapts to how many are on screen (set per data-count below).
+     Counts 2–4 deliberately share one size; only the arrangement changes. */
+  --bird-h: 38vh;
+  --bird-w: 44vw;
+  /* Shared "canvas" the birds composite onto. Replaced by the generated background in Phase 4. */
+  background:
+    radial-gradient(120% 90% at 50% 30%, var(--paper) 0%, var(--paper-deep) 78%, var(--paper-edge) 100%);
+  overflow: hidden;
+}
+
+/* soft inner vignette frame, echoing the per-bird vignette treatment */
+.stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 12vmin 6vmin rgba(42, 35, 24, 0.35);
+}
+
+.scene {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  /* Birds in a row share a baseline (labels line up) rather than floating at
+     different heights when their natural sizes differ. */
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2vmin 4vmin;
+  max-width: 98vw;
+}
+
+.caption {
+  position: absolute;
+  bottom: 4vmin;
+  z-index: 2;
+  text-align: center;
+  color: var(--ink-soft);
+  font-style: italic;
+  letter-spacing: 0.02em;
+  font-size: clamp(14px, 2.4vmin, 26px);
+}
+
+/* --- A bird portrait (real art) --- */
+.bird {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fade-in 1.2s ease both;
+}
+.bird img {
+  max-height: var(--bird-h);
+  max-width: var(--bird-w);
+  object-fit: contain;
+  filter: drop-shadow(0 2vmin 3vmin rgba(42, 35, 24, 0.25));
+}
+
+/* 1 bird: larger and centered. 2–4 birds: one shared size (the vars above),
+   only the arrangement differs. Max 4 on screen (capped in display.js). */
+.stage[data-count="1"] { --bird-h: 74vh; --bird-w: 86vw; }
+
+/* 3 birds: single bird alone on the top row, two side-by-side beneath it.
+   Full-width first item forces a wrap; its image still renders at --bird-w. */
+.stage[data-count="3"] .bird:first-child { flex-basis: 100%; }
+.bird .name {
+  margin-top: 0.4vmin;
+  font-size: clamp(18px, 3vmin, 40px);
+  color: var(--ink);
+}
+.bird .sci {
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: clamp(12px, 1.8vmin, 22px);
+}
+
+/* --- Placeholder plate when art isn't generated yet --- */
+.plate {
+  width: min(34vw, 340px);
+  aspect-ratio: 3 / 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4vmin;
+  border-radius: 50% / 42%;
+  background: radial-gradient(60% 55% at 50% 45%, #f2ead7 0%, rgba(242, 234, 215, 0) 72%);
+  animation: fade-in 1s ease both;
+}
+.plate .name { font-size: clamp(18px, 3vmin, 38px); color: var(--ink); }
+.plate .sci { font-style: italic; color: var(--ink-soft); font-size: clamp(12px, 1.8vmin, 22px); margin-top: 0.4em; }
+.plate .painting { margin-top: 1.2em; font-size: clamp(11px, 1.5vmin, 18px); color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* --- Collage mode: labelled grid that fills the vertical space ---
+   Cols/rows come from display.js (--collage-cols / --collage-rows). Each cell
+   is one row tall; the bird image and its common-name label are both sized off
+   --row-h, so they scale down together as more birds are heard. */
+.stage[data-mode="collage"] .scene {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;   /* centers a partial last row */
+  align-items: flex-end;     /* within a row, birds share a baseline so labels line up */
+  width: 94vw;
+  max-width: none;
+  /* Height is content-driven (no fixed height / space-evenly): a fixed row band
+     left dead space ABOVE each row, which pushed the whole group to the bottom.
+     Sizing to content lets .stage's justify-content:center centre the block. */
+  gap: 3vh 2vmin;
+  --row-h: calc(78vh / var(--collage-rows, 3));
+}
+.stage[data-mode="collage"] .bird {
+  flex: 0 0 calc(90vw / var(--collage-cols, 3) - 2vmin);
+}
+.stage[data-mode="collage"] .bird img {
+  max-height: calc(var(--row-h) * 0.66);
+  max-width: 100%;
+  filter: drop-shadow(0 1vmin 2vmin rgba(42, 35, 24, 0.22));
+}
+.stage[data-mode="collage"] .bird .name {
+  margin-top: 0.4vmin;
+  /* ~30% smaller than before (was clamp(9px, row-h*0.13, 34px)) — sits between
+     the old label size and the bottom caption (Ben, 2026-07-19). */
+  font-size: clamp(8px, calc(var(--row-h) * 0.09), 24px);
+  line-height: 1.05;
+  text-align: center;
+  /* Reserve two lines for every label so a wrapping name (e.g. "Brown-headed
+     Nuthatch") doesn't push its bird higher than its single-line neighbours. */
+  min-height: 2.1em;
+}
+.stage[data-mode="collage"] .plate {
+  flex: 0 0 calc(86vw / var(--collage-cols, 3));
+  max-height: var(--row-h);
+}
+
+/* --- Empty nest --- */
+.nest {
+  text-align: center;
+  animation: fade-in 1.4s ease both;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.nest .nest-img {
+  max-width: 64vw;
+  max-height: 48vh;
+  object-fit: contain;
+  filter: drop-shadow(0 2vmin 3vmin rgba(42, 35, 24, 0.22));
+}
+/* emoji fallback only (if the illustration is missing) */
+.nest .glyph { font-size: clamp(96px, 28vmin, 320px); line-height: 1; filter: saturate(0.6); }
+.nest .line { margin-top: 1.5vmin; font-size: clamp(16px, 3vmin, 34px); color: var(--ink-soft); font-style: italic; }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(1.5vmin); }
+  to { opacity: 1; transform: none; }
+}
+
+/* connection trouble indicator */
+.status {
+  position: fixed;
+  top: 1.2vmin;
+  right: 1.6vmin;
+  z-index: 5;
+  font-size: 12px;
+  color: #b23a2e;
+  background: rgba(255, 255, 255, 0.6);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* The wall art stays "paper" regardless of device theme — intentional. */
+}

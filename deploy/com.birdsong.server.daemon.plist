@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.birdsong.server</string>
+
+    <!-- Runs as Ben (needs ~/.local/node, ~/birdsong, and the .env) even though
+         it's a system daemon that starts at boot before any login. -->
+    <key>UserName</key>
+    <string>benniemann</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/benniemann/.local/bin/node</string>
+        <string>/Users/benniemann/birdsong/dist/server.js</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/benniemann/birdsong</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/benniemann/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+
+    <key>StandardOutPath</key>
+    <string>/Users/benniemann/birdsong/logs/server.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/benniemann/birdsong/logs/server.err.log</string>
+</dict>
+</plist>
