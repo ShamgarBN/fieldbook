@@ -1,0 +1,21 @@
+[Unit]
+# Fieldbook app server as a systemd service (the simple all-in-one-Pi setup).
+# Starts at boot, no login required. Adjust User= and the paths below if your
+# username isn't "pi" or you cloned somewhere other than ~/fieldbook.
+Description=Fieldbook app server
+After=network-online.target mosquitto.service docker.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/fieldbook
+ExecStart=/usr/bin/node /home/pi/fieldbook/dist/server.js
+Restart=always
+RestartSec=5
+# Logs go to the journal: journalctl -u fieldbook -f
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
