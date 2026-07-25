@@ -161,10 +161,6 @@ export function resetActivity(): { deleted: number } {
 // --- Manual regeneration (async; library reflects pending -> ready) ---
 const inFlight = new Set<string>();
 
-export function isRegenerating(species: string): boolean {
-  return inFlight.has(species);
-}
-
 export function regenerate(species: string): { started: boolean; reason?: string } {
   if (!species || !species.trim()) return { started: false, reason: "species required" };
   if (inFlight.has(species)) return { started: false, reason: "already regenerating" };

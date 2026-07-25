@@ -1,3 +1,6 @@
+// DEV-ONLY tool — not imported by the running server; run by hand during art
+// exploration and makes paid image-API calls.
+//
 // Generate a style sampler: N random birds rendered in each candidate art style,
 // each in a VARIED, style-appropriate pose (no more identical stock poses per species).
 // Writes to art/samples/<style-key>/<bird-slug>.png — separate from the live library.

@@ -1,3 +1,6 @@
+// DEV-ONLY tool — not imported by the running server; run by hand during art
+// exploration and makes paid image-API calls.
+//
 // Style-recipe confirmation: each KEPT style rendered as bird CUTOUTS on a
 // SIMPLE per-style ground (Ben's rule — no scenes/ornate backgrounds).
 // For each style: 1 opaque simple BACKGROUND + N transparent bird CUTOUTS.

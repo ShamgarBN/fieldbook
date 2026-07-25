@@ -29,10 +29,17 @@ export interface DisplayState {
 }
 
 export function slugify(species: string): string {
-  return species
+  const base = species
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+  // A name with no ASCII alphanumerics (e.g. non-Latin scripts) would collapse
+  // to "" and every such species would collide on the same file. Fall back to a
+  // short deterministic hash of the original so each still gets a unique slug.
+  if (base) return base;
+  let h = 0;
+  for (let i = 0; i < species.length; i++) h = (Math.imul(h, 31) + species.charCodeAt(i)) | 0;
+  return `sp-${(h >>> 0).toString(36)}`;
 }
 
 // --- settings overrides (config page can tune these) ---

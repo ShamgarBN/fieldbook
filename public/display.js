@@ -25,6 +25,16 @@ function el(tag, className, html) {
   return node;
 }
 
+// Same as el() but sets textContent — use for any string that originated from a
+// detection (species / scientific name). Those arrive from BirdNET / MQTT /
+// the webhook unauthenticated, so they must never be treated as HTML.
+function elText(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
 // showSci lets the collage show common names only (Ben, 2026-07-19) while the
 // active view keeps the scientific name.
 function birdNode(sp, { showName = true, showSci = true } = {}) {
@@ -35,13 +45,13 @@ function birdNode(sp, { showName = true, showSci = true } = {}) {
     img.src = sp.art.url;
     img.alt = sp.species;
     wrap.appendChild(img);
-    if (showName) wrap.appendChild(el("div", "name", sp.species));
-    if (showSci && sp.scientific) wrap.appendChild(el("div", "sci", sp.scientific));
+    if (showName) wrap.appendChild(elText("div", "name", sp.species));
+    if (showSci && sp.scientific) wrap.appendChild(elText("div", "sci", sp.scientific));
     return wrap;
   }
   const plate = el("div", "plate");
-  if (showName) plate.appendChild(el("div", "name", sp.species));
-  if (showSci && sp.scientific) plate.appendChild(el("div", "sci", sp.scientific));
+  if (showName) plate.appendChild(elText("div", "name", sp.species));
+  if (showSci && sp.scientific) plate.appendChild(elText("div", "sci", sp.scientific));
   plate.appendChild(el("div", "painting", sp.art && sp.art.status === "pending" ? "portrait being painted" : "no portrait yet"));
   return plate;
 }

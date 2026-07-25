@@ -11,12 +11,15 @@ const inFlight = new Set<string>();
 // Cost guard: cap how many new birds this process will paint on the fly. Each
 // generation is a paid image-API call, so an unfamiliar location (or a noisy
 // afternoon) shouldn't be able to run the bill up. 0 disables generation
-// entirely; unset falls back to the previous unlimited behaviour.
+// entirely; unset falls back to a sane bounded default (not unlimited — a
+// single flood of unknown species could otherwise cost real money). Raise
+// MAX_GROW_BIRDS in .env if a genuinely birdy yard needs more.
+const DEFAULT_MAX_GROWS = 50;
 const MAX_GROWS = (() => {
   const raw = process.env.MAX_GROW_BIRDS;
-  if (raw === undefined || raw === "") return Infinity;
+  if (raw === undefined || raw === "") return DEFAULT_MAX_GROWS;
   const n = Number(raw);
-  return Number.isFinite(n) && n >= 0 ? n : Infinity;
+  return Number.isFinite(n) && n >= 0 ? n : DEFAULT_MAX_GROWS;
 })();
 let grown = 0;
 
@@ -32,6 +35,7 @@ export function ensureArtFor(species: string | undefined, scientific?: string | 
     return;
   }
   grown++;
+  inFlight.add(species);
   console.log(`[grow] first time hearing "${species}" — painting it…`);
   generateBirdArt(species, scientific ?? null)
     .then(() => console.log(`[grow] "${species}" ready`))

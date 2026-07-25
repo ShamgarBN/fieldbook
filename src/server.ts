@@ -23,6 +23,34 @@ const startedAt = Date.now();
 const app = express();
 app.use(express.json());
 
+// CSRF guard for state-changing requests. This is a trusted-LAN device with no
+// login, so a malicious site the user visits shouldn't be able to drive their
+// browser into POSTing here (e.g. wiping history or running up art costs). We
+// reject any mutating request that carries a cross-origin `Origin` header.
+// Requests with no Origin (BirdNET-Go's webhook, curl, native clients) pass
+// through; same-origin fetches from the config/display pages match Host and pass.
+app.use((req, res, next) => {
+  if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") return next();
+  const origin = req.get("origin");
+  if (origin) {
+    let originHost: string;
+    try {
+      originHost = new URL(origin).host;
+    } catch {
+      return res.status(403).json({ error: "bad origin" });
+    }
+    if (originHost !== req.get("host")) {
+      return res.status(403).json({ error: "cross-origin request blocked" });
+    }
+  }
+  next();
+});
+
+// Dev-only routes (fake detections) are live on the dev laptop — where MQTT
+// isn't configured — but stay off on the real device unless explicitly enabled,
+// so nothing on the LAN can inject detections / trigger paid art there.
+const devRoutesEnabled = !config.mqtt.url || process.env.ENABLE_SIMULATE === "1";
+
 // --- Display state (polled by the Portal kiosk browser) ---
 app.get("/state", (_req, res) => {
   res.json(getState());
@@ -40,19 +68,22 @@ app.post("/webhook", (req, res) => {
 // --- Dev helper: inject a fake detection so the display can be exercised pre-hardware ---
 // e.g. curl -X POST localhost:3000/simulate -H 'content-type: application/json' \
 //        -d '{"species":"American Robin","confidence":0.9}'
-app.post("/simulate", (req, res) => {
-  const body = (req.body ?? {}) as { species?: string; scientific?: string; confidence?: number };
-  if (!body.species) return res.status(400).json({ error: "species required" });
-  const result = recordDetection({
-    species: body.species,
-    scientific: body.scientific,
-    confidence: body.confidence ?? 0.99,
-    detectedAt: Date.now(),
-    source: "simulate",
+// Gated: on the real device (MQTT configured) set ENABLE_SIMULATE=1 to turn on.
+if (devRoutesEnabled) {
+  app.post("/simulate", (req, res) => {
+    const body = (req.body ?? {}) as { species?: string; scientific?: string; confidence?: number };
+    if (!body.species) return res.status(400).json({ error: "species required" });
+    const result = recordDetection({
+      species: body.species,
+      scientific: body.scientific,
+      confidence: body.confidence ?? 0.99,
+      detectedAt: Date.now(),
+      source: "simulate",
+    });
+    if (result.accepted) ensureArtFor(body.species, body.scientific);
+    res.status(result.accepted ? 202 : 200).json({ ...result, state: getState() });
   });
-  if (result.accepted) ensureArtFor(body.species, body.scientific);
-  res.status(result.accepted ? 202 : 200).json({ ...result, state: getState() });
-});
+}
 
 app.get("/healthz", (_req, res) => res.json({ ok: true, mode: getState().mode }));
 
@@ -126,7 +157,8 @@ app.use("/art", express.static(config.artDir));
 app.use(express.static(config.publicDir)); // serves index.html (the display) at /
 
 app.listen(config.port, () => {
-  console.log(`[server] Fieldbook on http://localhost:${config.port}`);
-  console.log(`[server] display: /   state: /state   simulate: POST /simulate`);
+  // Binds all interfaces so the phone can reach the config page over the LAN.
+  console.log(`[server] Fieldbook listening on :${config.port} (reachable across the LAN)`);
+  console.log(`[server] display: /   config: /config   state: /state${devRoutesEnabled ? "   simulate: POST /simulate" : ""}`);
   startMqtt();
 });

@@ -61,6 +61,11 @@ export function getIngestStatus(): { mqttConfigured: boolean; mqttConnected: boo
   return { mqttConfigured: Boolean(config.mqtt.url), mqttConnected };
 }
 
+// Strip any user:pass@ credentials from an MQTT URL before it hits the logs.
+function redactUrl(url: string): string {
+  return url.replace(/\/\/[^/@]*@/, "//");
+}
+
 export function startMqtt(): void {
   if (!config.mqtt.url) {
     console.log("[mqtt] MQTT_URL not set — MQTT ingestion disabled (dev mode).");
@@ -75,7 +80,7 @@ export function startMqtt(): void {
 
   client.on("connect", () => {
     mqttConnected = true;
-    console.log(`[mqtt] connected to ${config.mqtt.url}`);
+    console.log(`[mqtt] connected to ${redactUrl(config.mqtt.url)}`);
     client.subscribe(config.mqtt.topic, (err) => {
       if (err) console.error(`[mqtt] subscribe failed for '${config.mqtt.topic}':`, err.message);
       else console.log(`[mqtt] subscribed to '${config.mqtt.topic}'`);
