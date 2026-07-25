@@ -10,6 +10,7 @@ import {
   getSettings,
   setActiveWindowMinutes,
   setNestWindowMinutes,
+  setCycleIntervalSeconds,
   resetActivity,
   regenerate,
   metrics,
@@ -22,6 +23,16 @@ const startedAt = Date.now();
 
 const app = express();
 app.use(express.json());
+
+// Baseline response-hardening headers. The kiosk serves its own pages directly
+// (never framed), so this is low-cost hygiene rather than closing a live hole —
+// the real cross-origin protection is the CSRF guard below.
+app.use((_req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  next();
+});
 
 // CSRF guard for state-changing requests. This is a trusted-LAN device with no
 // login, so a malicious site the user visits shouldn't be able to drive their
@@ -124,6 +135,10 @@ app.post("/api/settings", (req, res) => {
   }
   if (body.nestWindowMinutes !== undefined) {
     const result = setNestWindowMinutes(Number(body.nestWindowMinutes));
+    if (!result.ok) return res.status(400).json(result);
+  }
+  if (body.cycleIntervalSeconds !== undefined) {
+    const result = setCycleIntervalSeconds(Number(body.cycleIntervalSeconds));
     if (!result.ok) return res.status(400).json(result);
   }
   res.json({ ok: true, settings: getSettings() });

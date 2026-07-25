@@ -118,16 +118,20 @@ const upsertSetting = db.prepare(
    ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
 );
 
-export function getSettings(): { activeWindowMinutes: number; nestWindowMinutes: number } {
+export function getSettings(): { activeWindowMinutes: number; nestWindowMinutes: number; cycleIntervalSeconds: number } {
   const row = getSettingRow.get("active_window_minutes");
   const mins = row ? Number(row.value) : config.activeWindowMs / 60000;
 
   const nestRow = getSettingRow.get("nest_window_minutes");
   const nestMins = nestRow ? Number(nestRow.value) : config.nestWindowMs / 60000;
 
+  const cycleRow = getSettingRow.get("cycle_interval_seconds");
+  const cycleSecs = cycleRow ? Number(cycleRow.value) : config.cycleIntervalSeconds;
+
   return {
     activeWindowMinutes: Number.isFinite(mins) ? mins : config.activeWindowMs / 60000,
     nestWindowMinutes: Number.isFinite(nestMins) ? nestMins : config.nestWindowMs / 60000,
+    cycleIntervalSeconds: Number.isFinite(cycleSecs) ? cycleSecs : config.cycleIntervalSeconds,
   };
 }
 
@@ -146,6 +150,14 @@ export function setNestWindowMinutes(mins: number): { ok: boolean; reason?: stri
     return { ok: false, reason: "nest window must be between 0 and 120 minutes" };
   }
   upsertSetting.run("nest_window_minutes", String(Math.round(mins)));
+  return { ok: true };
+}
+
+export function setCycleIntervalSeconds(secs: number): { ok: boolean; reason?: string } {
+  if (!Number.isFinite(secs) || secs < 5 || secs > 300) {
+    return { ok: false, reason: "cycle interval must be between 5 and 300 seconds" };
+  }
+  upsertSetting.run("cycle_interval_seconds", String(Math.round(secs)));
   return { ok: true };
 }
 

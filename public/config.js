@@ -128,6 +128,36 @@ $("nest-save").addEventListener("click", async () => {
   }
 });
 
+// --- Collage cycle interval ---
+const cycleRange = $("cycle-range");
+const cycleOut = $("cycle-out");
+function fmtSecs(s) {
+  s = Number(s);
+  if (s < 60) return `${s}s`;
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return r === 0 ? `${m}m` : `${m}m ${r}s`;
+}
+cycleRange.addEventListener("input", () => {
+  cycleOut.textContent = fmtSecs(cycleRange.value);
+});
+$("cycle-save").addEventListener("click", async () => {
+  const btn = $("cycle-save");
+  btn.disabled = true;
+  try {
+    await api("/api/settings", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ cycleIntervalSeconds: Number(cycleRange.value) }),
+    });
+    toast(`Collage cycle set to ${fmtSecs(cycleRange.value)}`);
+  } catch (err) {
+    toast(`Couldn't save: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+  }
+});
+
 async function loadSettings() {
   try {
     const s = await api("/api/settings");
@@ -135,6 +165,8 @@ async function loadSettings() {
     out.textContent = `${s.activeWindowMinutes} min`;
     nestRange.value = s.nestWindowMinutes;
     nestOut.textContent = `${s.nestWindowMinutes} min`;
+    cycleRange.value = s.cycleIntervalSeconds;
+    cycleOut.textContent = fmtSecs(s.cycleIntervalSeconds);
   } catch {}
 }
 

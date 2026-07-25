@@ -28,6 +28,8 @@ export const config = {
   // collage takes over. 0 = straight to the collage (the pre-2026-07 behaviour).
   nestWindowMs: num("NEST_WINDOW_MINUTES", 15) * 60 * 1000,
   collageWindowMs: num("COLLAGE_WINDOW_HOURS", 48) * 60 * 60 * 1000,
+  // How often the 48h collage swaps some birds (when >9 have been heard).
+  cycleIntervalSeconds: num("CYCLE_INTERVAL_SECONDS", 30),
   minConfidence: num("MIN_CONFIDENCE", 0.6),
 
   // MQTT ingestion (empty MQTT_URL disables the subscriber — useful on the dev laptop)

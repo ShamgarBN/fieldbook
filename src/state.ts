@@ -25,6 +25,7 @@ export interface DisplayState {
   collage: SpeciesView[]; // distinct species heard within the 48h rolling window
   generatedAt: number;
   pollSeconds: number;
+  cycleSeconds: number; // collage swap interval (config-tunable)
   previewId?: number; // set while a manual "Preview" override is on the wall
 }
 
@@ -59,6 +60,13 @@ function nestWindowMs(): number {
   const row = getSetting.get("nest_window_minutes");
   const mins = row ? Number(row.value) : NaN;
   return Number.isFinite(mins) && mins >= 0 ? mins * 60 * 1000 : config.nestWindowMs;
+}
+
+// How often the collage swaps birds (seconds). Read by the display each poll.
+function cycleIntervalSeconds(): number {
+  const row = getSetting.get("cycle_interval_seconds");
+  const secs = row ? Number(row.value) : NaN;
+  return Number.isFinite(secs) && secs > 0 ? secs : config.cycleIntervalSeconds;
 }
 
 // --- writes ---
@@ -163,7 +171,7 @@ export function getState(now = Date.now()): DisplayState {
       count: 1,
       art: artView(preview.species),
     };
-    return { mode: "active", active: [bird], collage: [], generatedAt: now, pollSeconds: config.displayPollSeconds, previewId: preview.id };
+    return { mode: "active", active: [bird], collage: [], generatedAt: now, pollSeconds: config.displayPollSeconds, cycleSeconds: cycleIntervalSeconds(), previewId: preview.id };
   }
   if (preview) preview = null; // safety window elapsed — drop it
 
@@ -189,5 +197,6 @@ export function getState(now = Date.now()): DisplayState {
     collage,
     generatedAt: now,
     pollSeconds: config.displayPollSeconds,
+    cycleSeconds: cycleIntervalSeconds(),
   };
 }

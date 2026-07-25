@@ -91,6 +91,17 @@
     </div>
 
     <div class="card">
+      <h2>Collage cycle</h2>
+      <p class="hint">On the 48-hour screen, how often some birds swap for others. Only matters when more than 9 species have been heard in 48h.</p>
+      <div class="slider-row">
+        <input type="range" id="cycle-range" min="5" max="300" step="5" />
+        <output id="cycle-out">30s</output>
+      </div>
+      <button class="btn" id="cycle-save">Save</button>
+      <span class="save-note" id="cycle-note" hidden></span>
+    </div>
+
+    <div class="card">
       <h2>Reset activity</h2>
       <p class="hint">Permanently deletes all detection history — clears the collage, the detection log, and the Activity stats. Your art library is kept. Use this to wipe test data before going live.</p>
       <button class="btn danger" id="reset-activity">Reset recent activity</button>
