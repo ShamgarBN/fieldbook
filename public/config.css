@@ -227,6 +227,8 @@ input[type="range"] { flex: 1; height: 32px; accent-color: var(--accent); }
 .tile .regen:disabled { opacity: 0.5; }
 /* Preview = primary action (filled); Regenerate stays the ghost outline. */
 .tile .regen.preview { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+/* Armed confirm state: a paid regen needs a second, deliberate tap. */
+.tile .regen.confirm { background: var(--warn); color: var(--accent-ink); border-color: var(--warn); }
 .tile .wild {
   position: absolute; top: 6px; left: 6px;
   font-size: 10px; font-weight: 700; letter-spacing: 0.03em;

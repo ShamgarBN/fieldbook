@@ -261,7 +261,7 @@ function makeTile(it) {
   btn.className = "regen";
   btn.textContent = it.status === "pending" ? "…" : "Regenerate";
   btn.disabled = it.status === "pending";
-  btn.addEventListener("click", () => regenerate(it.species, btn));
+  btn.addEventListener("click", () => armRegen(it.species, btn));
 
   const actions = document.createElement("div");
   actions.className = "tactions";
@@ -376,6 +376,29 @@ async function previewBird(it, btn) {
       btn.disabled = it.status !== "ready";
     }, PREVIEW_MS);
   }
+}
+
+// Regenerate is a paid image-API call, so require a second, deliberate tap.
+// First tap arms the button ("Confirm?"); a second tap within 4s regenerates.
+// If they don't confirm, it quietly reverts to "Regenerate".
+function armRegen(species, btn) {
+  if (btn.dataset.armed === "1") {
+    clearTimeout(Number(btn.dataset.armTimer));
+    delete btn.dataset.armed;
+    btn.classList.remove("confirm");
+    regenerate(species, btn);
+    return;
+  }
+  btn.dataset.armed = "1";
+  btn.classList.add("confirm");
+  btn.textContent = "Confirm?";
+  btn.dataset.armTimer = String(
+    setTimeout(() => {
+      delete btn.dataset.armed;
+      btn.classList.remove("confirm");
+      btn.textContent = "Regenerate";
+    }, 4000),
+  );
 }
 
 async function regenerate(species, btn) {
