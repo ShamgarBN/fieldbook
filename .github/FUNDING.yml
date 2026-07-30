@@ -1,6 +1,0 @@
-# Adds a "Sponsor" button to the top of the GitHub repo.
-# Docs: https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
-#
-# The value is your Buy Me a Coffee username — the part after the slash in
-# https://buymeacoffee.com/<username>
-buy_me_a_coffee: makeforlife

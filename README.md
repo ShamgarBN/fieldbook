@@ -17,19 +17,6 @@ internet is the one-time (and optional) art generation.
 
 ---
 
-<div align="center">
-
-### ☕ Enjoying Fieldbook?
-
-Fieldbook is a labour of love, built and maintained in my spare time. If it brought a
-little birdsong and hand-drawn art into your home, you can help keep it going:
-
-[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/makeforlife)
-
-</div>
-
----
-
 ## Table of contents
 
 - [How it works](#how-it-works)
