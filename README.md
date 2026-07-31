@@ -8,6 +8,8 @@ rotating collage of everyone heard in the last 48 hours when the yard goes quiet
 Everything runs **locally on your own network**. The only thing that ever touches the
 internet is the one-time (and optional) art generation.
 
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?style=flat-square&logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/makeforlife)
+
 ```
   🎤  mic  ──►  🍓 Raspberry Pi  ──►  🖼️  any screen with a browser
               (BirdNET-Go listens,      (shows the art, full-screen)
